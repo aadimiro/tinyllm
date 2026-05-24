@@ -84,7 +84,7 @@ class TrainConfig:
 
     # --- Data ---
     train_split: float = 0.9        # 90% train, 10% validation
-    data_dir: str = "data/squad"    # Where processed data lives
+    data_dir: str = "data"          # Where processed data lives (relative to demo dir)
     checkpoint_dir: str = "checkpoints"  # Where model weights are saved
 
     # --- Device ---

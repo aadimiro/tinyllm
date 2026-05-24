@@ -1,6 +1,7 @@
 # Ignore training data and model checkpoints
-data/
-checkpoints/
+**/data/
+**/checkpoints/
+**/output/
 *.pt
 
 # Python

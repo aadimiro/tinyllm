@@ -33,16 +33,19 @@ We use warmup + cosine decay:
 
 import math
 import os
+import sys
 import time
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import torch
 import torch.nn as nn
 
 from config import ModelConfig, TrainConfig
 from model import TinyLLM
-from tokenizer import Tokenizer
-from data import get_dataloaders
 from utils import save_checkpoint, load_checkpoint
+from squad_tokenizer import Tokenizer
+from squad_data import get_dataloaders
 
 
 def get_lr(step: int, config: TrainConfig) -> float:

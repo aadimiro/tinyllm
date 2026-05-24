@@ -16,8 +16,13 @@ The tokenizer learns which character combinations appear frequently
 in our training data and creates efficient subword tokens for them.
 """
 
-from data import prepare_tokenizer_corpus, download_squad
-from tokenizer import Tokenizer
+import os
+import sys
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
+
+from squad_data import prepare_tokenizer_corpus, download_squad
+from squad_tokenizer import Tokenizer
 from config import ModelConfig
 
 

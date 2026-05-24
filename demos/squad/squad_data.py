@@ -21,15 +21,18 @@ The <|end|> token (EOS) tells the model when to stop generating.
 
 import json
 import os
+import sys
 import random
 from pathlib import Path
 from urllib.request import urlretrieve
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../.."))
 
 import torch
 from torch.utils.data import Dataset, DataLoader
 
 from config import ModelConfig, TrainConfig
-from tokenizer import Tokenizer, EOS_ID
+from squad_tokenizer import Tokenizer, EOS_ID
 
 
 # SQuAD v1.1 download URLs (Stanford's public hosting)
@@ -37,7 +40,7 @@ SQUAD_TRAIN_URL = "https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1
 SQUAD_DEV_URL = "https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json"
 
 
-def download_squad(data_dir: str = "data/squad") -> tuple[str, str]:
+def download_squad(data_dir: str = "data") -> tuple[str, str]:
     """
     Download SQuAD v1.1 train and dev sets if not already present.
 
@@ -227,7 +230,7 @@ def get_dataloaders(
     return train_loader, val_loader
 
 
-def prepare_tokenizer_corpus(data_dir: str = "data/squad",
+def prepare_tokenizer_corpus(data_dir: str = "data",
                              output_file: str = "data/corpus.txt") -> str:
     """
     Extract all text from SQuAD into a plain text file for tokenizer training.

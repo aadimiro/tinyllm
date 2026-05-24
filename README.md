@@ -50,9 +50,41 @@ heavily commented to explain *why*, not just *what*.
 | Training data | SQuAD v1.1 (100K Q&A pairs) |
 | Task | Extractive Question Answering |
 
-## File Structure (Reading Order)
+## Project Structure
 
-Start here to understand the architecture bottom-up:
+The model architecture is **shared** — demos only change what goes in (data) and what comes out.
+
+```
+tinyllm/
+├── config.py              # Hyperparameters (shared)
+├── attention.py           # Multi-head self-attention (shared)
+├── transformer_block.py   # Transformer block: attention + FFN (shared)
+├── model.py               # Full model: embeddings + blocks + head (shared)
+├── utils.py               # Checkpointing helpers (shared)
+├── requirements.txt
+│
+├── demos/
+│   ├── squad/             # Demo 1: Q&A on text (SQuAD dataset)
+│   │   ├── squad_tokenizer.py    # BPE text tokenizer
+│   │   ├── squad_data.py         # SQuAD download + formatting
+│   │   ├── squad_train.py        # Training loop for Q&A
+│   │   ├── squad_generate.py     # Interactive Q&A inference
+│   │   ├── train_tokenizer.py    # Script to build BPE vocab
+│   │   └── TinyLLM_Colab.ipynb   # Run on Google Colab
+│   │
+│   └── midi/              # Demo 2: Melody generation (Nottingham folk tunes)
+│       ├── midi_config.py         # 68-token musical vocabulary
+│       ├── midi_tokenizer.py      # MIDI ↔ token conversion
+│       ├── midi_data.py           # Download + process MIDI files
+│       ├── midi_train.py          # Training loop for music
+│       ├── midi_generate.py       # Generate .mid files
+│       └── TinyLLM_MIDI_Colab.ipynb
+```
+
+**Key insight:** `model.py` is identical for text and music. The transformer
+doesn't "know" what it's processing — it just learns patterns between tokens.
+
+## Reading Order (learn the architecture)
 
 | # | File | What it teaches |
 |---|------|-----------------|
@@ -60,51 +92,35 @@ Start here to understand the architecture bottom-up:
 | 2 | `attention.py` | The attention mechanism — how tokens "look at" each other |
 | 3 | `transformer_block.py` | One complete block — attention + FFN + residuals |
 | 4 | `model.py` | Full model assembly — embeddings + blocks + output head |
-| 5 | `tokenizer.py` | BPE tokenization — how text becomes numbers |
-| 6 | `data.py` | Data pipeline — loading, formatting, batching |
-| 7 | `train.py` | Training loop — forward, backward, optimize |
-| 8 | `generate.py` | Inference — how the model generates text |
-| 9 | `utils.py` | Checkpointing and logging helpers |
+| 5 | `demos/squad/` | Text Q&A demo — BPE tokenization, SQuAD data, generation |
+| 6 | `demos/midi/` | Music demo — same model, completely different domain |
 
 ## Quick Start
 
-### 1. Install dependencies
+### Demo 1: Text Q&A (SQuAD)
 
 ```bash
 pip install -r requirements.txt
+cd demos/squad
+python train_tokenizer.py   # Download SQuAD + train BPE tokenizer
+python squad_train.py       # Train (~hours on CPU, ~30 min on GPU)
+python squad_generate.py --checkpoint checkpoints/best.pt
 ```
 
-### 2. Train the tokenizer
-
-Downloads SQuAD and trains a BPE tokenizer:
+### Demo 2: MIDI Melody Generation
 
 ```bash
-python train_tokenizer.py
+pip install -r requirements.txt
+pip install pretty_midi
+cd demos/midi
+python midi_train.py        # Train on folk melodies (~5-10 min)
+python midi_generate.py     # Generate .mid files you can listen to
 ```
 
-### 3. Train the model
+### Google Colab (GPU, no setup)
 
-```bash
-python train.py
-```
-
-Training on CPU takes several hours. On a GPU it takes ~30 minutes.
-You'll see loss decrease from ~9.0 (random) to ~2.0 (learning patterns).
-
-### 4. Ask questions
-
-```bash
-python generate.py --checkpoint checkpoints/best.pt
-```
-
-Or non-interactively:
-
-```bash
-python generate.py \
-  --context "The Eiffel Tower is a wrought-iron lattice tower in Paris, France. It was constructed from 1887 to 1889." \
-  --question "When was the Eiffel Tower built?" \
-  --checkpoint checkpoints/best.pt
-```
+- Q&A: `https://colab.research.google.com/github/aadimiro/tinyllm/blob/master/demos/squad/TinyLLM_Colab.ipynb`
+- MIDI: `https://colab.research.google.com/github/aadimiro/tinyllm/blob/master/demos/midi/TinyLLM_MIDI_Colab.ipynb`
 
 ## How It Works (for learners)
 
